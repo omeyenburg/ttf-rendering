@@ -9,5 +9,7 @@ int main(void) {
     }
     atexit(SDL_Quit);
 
+    printf("Running\n");
+
     return 0;
 }

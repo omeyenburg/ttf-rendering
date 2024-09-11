@@ -1,7 +1,12 @@
+.PHONY: build
+
+
 build:
-	@gcc main.c -o main $(shell pkg-config --cflags --libs sdl2)
-	@echo 'Successfully compiled SDL project. Run it using "./main".'
+	@mkdir -p build
+	@gcc main.c -o build/main $(shell pkg-config --cflags --libs sdl2)
+	@echo 'Successfully compiled SDL project. Run it using "build/main".'
 run:
-	@gcc main.c -o main $(shell pkg-config --cflags --libs sdl2)
-	@echo 'Successfully compiled SDL project. Executing "./main"...'
-	@./main
+	@mkdir -p build
+	@gcc main.c -o build/main $(shell pkg-config --cflags --libs sdl2)
+	@echo 'Successfully compiled SDL project. Executing "build/main"...'
+	@./build/main
