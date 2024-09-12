@@ -5,7 +5,8 @@
 int main(void) {
     printf("Running\n");
     load("resources/ComicMono.ttf");
-    create_window();
+    // load("resources/Ubuntu.ttf");
+    // create_window();
 
     return 0;
 }
