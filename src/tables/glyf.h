@@ -15,6 +15,7 @@ void parse_compound_glyph(Glyph* glyph,
 Glyph parse_single_glyph(unsigned char* buffer,
                          Table* glyf,
                          uint32_t* glyf_offsets,
-                         uint16_t numGlyphs);
+                         uint16_t numGlyphs,
+                         uint16_t index);
 
 #endif // GLYF_H

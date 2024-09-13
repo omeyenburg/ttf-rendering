@@ -49,7 +49,6 @@ void load(char* path);
 int16_t parse_head(unsigned char* buffer, Table* head);
 uint16_t parse_maxp(unsigned char* buffer, Table* maxp);
 void parse_loca(uint32_t* glyf_offsets,
-                uint32_t* glyf_lengths,
                 unsigned char* buffer,
                 Table* loca,
                 uint16_t numGlyphs,
@@ -59,7 +58,10 @@ void parse_glyf(Glyph* glyphs,
                 Table* glyf,
                 uint32_t* glyf_offsets,
                 uint16_t numGlyphs);
-void parse_cmap(unsigned char* buffer, Table* cmap);
+void parse_cmap(uint32_t characters[],
+                unsigned char* buffer,
+                Table* cmap,
+                uint32_t glyf_offset[]);
 void parse_htmx(unsigned char* buffer, Table* htmx);
 
 #endif // TTF_H

@@ -1,6 +1,9 @@
 #include "../ttf.h"
 
-void parse_cmap(unsigned char* buffer, Table* cmap) {
+void parse_cmap(uint32_t characters[],
+                unsigned char* buffer,
+                Table* cmap,
+                uint32_t glyf_offset[]) {
     if (!cmap->initialized) {
         fprintf(stderr, "Table \"cmap\" was not found!\n");
         exit(1);
@@ -100,9 +103,22 @@ void parse_cmap(unsigned char* buffer, Table* cmap) {
         glyphIndexArray[i / 2] = getInt16(buffer, glyph_index_offset + i);
     }
 
+    uint32_t charCount = 0;
+    for (int j = 0; j < segCount; j++) {
+        uint16_t endCode = getInt16(buffer, cmap->offset + offset + 14 + j * 2);
+        uint16_t startCode =
+            getInt16(buffer, cmap->offset + offset + 14 + segCountX2 + j * 2);
+        if (startCode <= endCode) {
+            charCount += (endCode - startCode +
+                          1); // Count how many characters are in this segment
+        }
+    }
+    printf("Found chars: %i\n", charCount);
+
     // Print out the mapping for character codes to glyph indices
     int num_glyphs = 0;
     for (uint16_t character_code = 0; character_code <= 255; character_code++) {
+        characters[character_code] = 0;
         for (int i = 0; i < segCount; i++) {
             if (character_code >= startCode[i] && character_code <= endCount[i]) {
                 uint16_t glyph_index;
@@ -119,8 +135,10 @@ void parse_cmap(unsigned char* buffer, Table* cmap) {
 
                 // Check if the glyph index is valid
                 if (glyph_index != 0) { // Glyph index 0 means no glyph
-                    // printf("Character Code: %u => Glyph Index: %u\n", character_code,
-                    // glyph_index);
+                    characters[character_code] = glyph_index;
+                    // printf("Character Code: %u => Glyph Index: %u\n",
+                    //        character_code,
+                    //        glyph_index);
                     num_glyphs += 1;
                 }
                 break;
