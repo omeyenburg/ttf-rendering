@@ -2,7 +2,7 @@
 
 int16_t parse_head(unsigned char* buffer, Table* head) {
     if (!head->initialized) {
-        fprintf(stderr, "Table \"head\" was not found!:\n");
+        fprintf(stderr, "Table \"head\" was not found!\n");
         exit(1);
     }
 

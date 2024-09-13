@@ -7,7 +7,7 @@ void parse_loca(uint32_t* glyf_offsets,
                 uint16_t numGlyphs,
                 int16_t indexToLocFormat) {
     if (!loca->initialized) {
-        fprintf(stderr, "Table \"loca\" was not found!:\n");
+        fprintf(stderr, "Table \"loca\" was not found!\n");
         exit(1);
     }
 

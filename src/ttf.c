@@ -121,9 +121,10 @@ void load(char* path) {
     // Relative offsets in glyf; first index used for missing character glyph
     uint32_t glyf_offsets[numGlyphs];
     uint32_t glyf_lengths[numGlyphs];
+    Glyph glyphs[numGlyphs];
 
     parse_loca(glyf_offsets, glyf_lengths, buffer, &loca, numGlyphs, indexToLocFormat);
-    parse_glyf(buffer, &glyf, glyf_offsets, glyf_lengths, numGlyphs);
+    parse_glyf(glyphs, buffer, &glyf, glyf_offsets, numGlyphs);
     parse_cmap(buffer, &cmap);
     parse_htmx(buffer, &htmx);
 

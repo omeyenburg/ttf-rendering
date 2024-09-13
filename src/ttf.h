@@ -54,10 +54,10 @@ void parse_loca(uint32_t* glyf_offsets,
                 Table* loca,
                 uint16_t numGlyphs,
                 int16_t indexToLocFormat);
-void parse_glyf(unsigned char* buffer,
+void parse_glyf(Glyph* glyphs,
+                unsigned char* buffer,
                 Table* glyf,
                 uint32_t* glyf_offsets,
-                uint32_t* glyf_lengths,
                 uint16_t numGlyphs);
 void parse_cmap(unsigned char* buffer, Table* cmap);
 void parse_htmx(unsigned char* buffer, Table* htmx);
