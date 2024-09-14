@@ -168,4 +168,10 @@ void load(char* path) {
     printf("\n");
     printf("%s has %i points\n", c, glyphs[n].numPoints);
     printf("%s has %i contours\n", c, glyphs[n].numberOfContours);
+
+    // Deallocate memory
+    for (int i = 0; i < numGlyphs; i++) {
+        free(glyphs[i].points);
+        free(glyphs[i].endPtsOfContours);
+    }
 }
