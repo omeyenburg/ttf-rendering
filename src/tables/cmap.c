@@ -19,18 +19,15 @@ uint16_t get_cmap_size(unsigned char* buffer, Table* cmap) {
     }
 
     uint16_t platform_id = 4;
-    uint16_t platform_specific_id = 0;
     uint32_t offset = 0;
     uint32_t buffer_offset = cmap->offset + 4;
     for (int i = 0; i < numSubtables; i++) {
         uint16_t sub_platform_id = getInt16(buffer, buffer_offset);
-        uint16_t sub_platform_specific_id = getInt16(buffer, buffer_offset + 2);
         uint32_t sub_offset = getInt32(buffer, buffer_offset + 4);
 
         if (platform_id == 4 || platform_id != 0 ||
             (platform_id == 1 && sub_platform_id == 3)) {
             platform_id = sub_platform_id;
-            platform_specific_id = sub_platform_specific_id;
             offset = cmap->offset + sub_offset;
         }
 
@@ -81,18 +78,15 @@ void parse_cmap(CharacterMap* charMap,
     }
 
     uint16_t platform_id = 4;
-    uint16_t platform_specific_id = 0;
     uint32_t offset = 0;
     uint32_t buffer_offset = cmap->offset + 4;
     for (int i = 0; i < numSubtables; i++) {
         uint16_t sub_platform_id = getInt16(buffer, buffer_offset);
-        uint16_t sub_platform_specific_id = getInt16(buffer, buffer_offset + 2);
         uint32_t sub_offset = getInt32(buffer, buffer_offset + 4);
 
         if (platform_id == 4 || platform_id != 0 ||
             (platform_id == 1 && sub_platform_id == 3)) {
             platform_id = sub_platform_id;
-            platform_specific_id = sub_platform_specific_id;
             offset = cmap->offset + sub_offset;
         }
 

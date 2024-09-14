@@ -3,7 +3,6 @@
 #include <stdio.h>
 
 int main(void) {
-    printf("Running\n");
     load("resources/ComicMono.ttf");
     load("resources/Ubuntu.ttf");
     // create_window();

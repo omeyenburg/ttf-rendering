@@ -62,6 +62,6 @@ void parse_cmap(CharacterMap* charMap,
                 unsigned char* buffer,
                 Table* cmap,
                 uint16_t numChars);
-void parse_htmx(unsigned char* buffer, Table* htmx);
+void parse_hmtx(unsigned char* buffer, Table* hmtx);
 
 #endif // TTF_H

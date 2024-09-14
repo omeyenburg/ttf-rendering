@@ -32,7 +32,9 @@ void load(char* path) {
     unsigned char* buffer;
 
     fp = fopen(path, "rb");
-    if (fp == NULL) { // Check if file opened successfully
+
+    // Check if file opened successfully
+    if (fp == NULL) {
         printf("Error: There was an error opening the file %s \n", path);
         exit(1);
     }
@@ -41,58 +43,54 @@ void load(char* path) {
     size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
-    if (size == 0) { // Check if file size is zero
+    // Check if file size is zero
+    if (size == 0) {
         printf("Error: The file %s is empty.\n", path);
         fclose(fp);
         exit(1);
     }
 
     buffer = malloc(size);
-    if (buffer == NULL) { // Check if malloc was successful
+
+    // Check if malloc was successful
+    if (buffer == NULL) {
         printf("Error: Memory allocation failed.\n");
         fclose(fp);
         exit(1);
     }
 
-    if (fread(buffer, 1, size, fp) != size) { // Correct read statement
+    if (fread(buffer, 1, size, fp) != size) {
         printf(
             "Error: There was an error reading the file %s \nUnexpected file size.\n",
             path);
         free(buffer);
         fclose(fp);
         exit(1);
-    } else {
-        for (size_t i = 0; i < size; i++) {
-            // char c = buffer[i];
-            //  printf("%02x ", buffer[i]);
-            //  printf("%c ", c);
-        }
-        printf("\n"); // Print a newline for better formatting
     }
 
+    // Check version
     uint32_t version = getInt32(buffer, 0);
-    printf("Version: %i\n", version);
+    if (version != 65536) {
+        fprintf(stderr, "Unexpected font version: %i\n", version);
+        exit(1);
+    }
 
+    // Get number of tables
     uint16_t numTables = getInt16(buffer, 4);
-    printf("Num tables: %i\n", numTables);
 
+    // Read table offsets
     Table cmap;
     Table glyf;
     Table head;
-    Table htmx;
+    Table hmtx;
     Table loca;
     Table maxp;
-
     int buffer_offset = 12;
     for (int i = 0; i < numTables; i++) {
         const char* label = bytes4xchar(buffer, buffer_offset);
         uint32_t checkSum = getInt32(buffer, buffer_offset + 4);
         uint32_t offset = getInt32(buffer, buffer_offset + 8);
         uint32_t length = getInt32(buffer, buffer_offset + 12);
-        // printf("Label: %s\t", label);
-        // printf("Check sum: %u\t", checkSum);
-        // printf("Offset: %u\t", offset);
-        // printf("Length: %u\n", length);
 
         if (strcmp(label, "cmap") == 0) {
             cmap.initialized = true;
@@ -109,11 +107,11 @@ void load(char* path) {
             head.checkSum = checkSum;
             head.offset = offset;
             head.length = length;
-        } else if (strcmp(label, "htmx") == 0) {
-            htmx.initialized = true;
-            htmx.checkSum = checkSum;
-            htmx.offset = offset;
-            htmx.length = length;
+        } else if (strcmp(label, "hmtx") == 0) {
+            hmtx.initialized = true;
+            hmtx.checkSum = checkSum;
+            hmtx.offset = offset;
+            hmtx.length = length;
         } else if (strcmp(label, "loca") == 0) {
             loca.initialized = true;
             loca.checkSum = checkSum;
@@ -130,29 +128,30 @@ void load(char* path) {
     }
 
     int16_t indexToLocFormat = parse_head(buffer, &head);
-    uint16_t numGlyphs = parse_maxp(buffer, &maxp); // maybe add 1
+    uint16_t numGlyphs = parse_maxp(buffer, &maxp);
 
-    printf("locFormat: %i, numGlyphs: %i\n", indexToLocFormat, numGlyphs);
-
-    // Relative offsets in glyf; first index used for missing character glyph
+    // Relative offsets in glyf
     uint32_t glyf_offsets[numGlyphs];
     Glyph glyphs[numGlyphs];
 
+    // Get number of mapped characters
     uint16_t numChars = get_cmap_size(buffer, &cmap);
     CharacterMap charMap[numChars];
 
+    // Get font data
     parse_loca(glyf_offsets, buffer, &loca, numGlyphs, indexToLocFormat);
     parse_glyf(glyphs, buffer, &glyf, glyf_offsets, numGlyphs);
     parse_cmap(charMap, buffer, &cmap, numChars);
-    parse_htmx(buffer, &htmx);
+    parse_hmtx(buffer, &hmtx);
 
+    // Close font file and deallocate buffer
     fclose(fp);
     free(buffer);
 
+    // Get glyph index n from character
     int n = 0;
     unsigned char c[] = "Ä";
     uint16_t u = unicode(c);
-    printf("%s has unicode value %i\n", c, u);
     for (int i = 0; i < numChars; i++) {
         if (charMap[i].unicode == u) {
             n = charMap[i].index;
@@ -160,14 +159,11 @@ void load(char* path) {
         }
     }
 
-    // printf("A in ascii is: %i\n", 'A');
-    // int n = 36;
+    // Print out points of glyph n
     for (int i = 0; i < glyphs[n].numPoints; i++) {
         printf("(%i, %i), ", glyphs[n].points[i].x, glyphs[n].points[i].y);
     }
     printf("\n");
-    printf("%s has %i points\n", c, glyphs[n].numPoints);
-    printf("%s has %i contours\n", c, glyphs[n].numberOfContours);
 
     // Deallocate memory
     for (int i = 0; i < numGlyphs; i++) {
