@@ -13,7 +13,7 @@ void parse_simple_glyph(Glyph* glyph,
 
     // Populate end points
     for (int j = 0; j < numberOfContours; j++) {
-        uint16_t index = getInt16(buffer, offset + 2 * j);
+        uint16_t index = getUInt16(buffer, offset + 2 * j);
         glyph->endPtsOfContours[j] = index;
     }
 
@@ -22,7 +22,7 @@ void parse_simple_glyph(Glyph* glyph,
     glyph->numPoints = num_points;
 
     // Skip instructions section
-    uint16_t instructionLength = getInt16(buffer, offset + 2 * numberOfContours);
+    uint16_t instructionLength = getUInt16(buffer, offset + 2 * numberOfContours);
     offset += 2 + 2 * numberOfContours + instructionLength;
 
     uint8_t flags[num_points];
@@ -88,7 +88,7 @@ void parse_simple_glyph(Glyph* glyph,
             if (flags[j] & 0x10) {
                 x = 0;
             } else {
-                x = getInt16(buffer, x_offset);
+                x = getUInt16(buffer, x_offset);
                 x_offset += 2;
             }
         }
@@ -105,7 +105,7 @@ void parse_simple_glyph(Glyph* glyph,
             if (flags[j] & 0x20) {
                 y = 0;
             } else {
-                y = getInt16(buffer, y_offset);
+                y = getUInt16(buffer, y_offset);
                 y_offset += 2;
             }
         }
@@ -132,7 +132,7 @@ void parse_compound_glyph(Glyph* glyph,
     uint16_t numCompounds = 0;
     uint32_t counting_offset = offset;
     do {
-        flags = getInt16(buffer, counting_offset);
+        flags = getUInt16(buffer, counting_offset);
         counting_offset += 4;
 
         // Handle the argument types based on the flags
@@ -168,8 +168,8 @@ void parse_compound_glyph(Glyph* glyph,
     uint16_t* compound_end_points[numCompounds];
 
     for (int i = 0; i < numCompounds; i++) {
-        flags = getInt16(buffer, offset);
-        uint16_t glyphIndex = getInt16(buffer, offset + 2);
+        flags = getUInt16(buffer, offset);
+        uint16_t glyphIndex = getUInt16(buffer, offset + 2);
         offset += 4; // Move past the flags and glyphIndex
 
         Glyph child =
@@ -180,8 +180,8 @@ void parse_compound_glyph(Glyph* glyph,
         // Check if arguments are words or bytes
         if (flags & 0x0001) {
             // ARG_1_AND_2_ARE_WORDS - arguments are 16-bit
-            arg1 = getInt16(buffer, offset);
-            arg2 = getInt16(buffer, offset + 2);
+            arg1 = getUInt16(buffer, offset);
+            arg2 = getUInt16(buffer, offset + 2);
             offset += 4;
         } else {
             // Arguments are 8-bit
@@ -230,7 +230,7 @@ void parse_compound_glyph(Glyph* glyph,
             // WE_HAVE_A_SCALE - Single scale value
             // TODO: test if this should be 65536.0 (16.16 or 2.14), but for 16.16
             // format it would need a 32 int
-            float scale = getInt16(buffer, offset) / 16384.0;
+            float scale = getUInt16(buffer, offset) / 16384.0;
             offset += 2;
 
             for (int j = 0; j < child.numPoints; j++) {
@@ -239,8 +239,8 @@ void parse_compound_glyph(Glyph* glyph,
             }
         } else if (flags & 0x0040) {
             // WE_HAVE_AN_X_AND_Y_SCALE - Separate x, y scaling
-            float xscale = getInt16(buffer, offset) / 16384.0;
-            float yscale = getInt16(buffer, offset + 2) / 16384.0;
+            float xscale = getUInt16(buffer, offset) / 16384.0;
+            float yscale = getUInt16(buffer, offset + 2) / 16384.0;
             offset += 4;
 
             for (int j = 0; j < child.numPoints; j++) {
@@ -249,10 +249,10 @@ void parse_compound_glyph(Glyph* glyph,
             }
         } else if (flags & 0x0080) {
             // WE_HAVE_A_TWO_BY_TWO - 2x2 transformation matrix
-            float xscale = getInt16(buffer, offset) / 16384.0;
-            float scale01 = getInt16(buffer, offset + 2) / 16384.0;
-            float scale10 = getInt16(buffer, offset + 4) / 16384.0;
-            float yscale = getInt16(buffer, offset + 6) / 16384.0;
+            float xscale = getUInt16(buffer, offset) / 16384.0;
+            float scale01 = getUInt16(buffer, offset + 2) / 16384.0;
+            float scale10 = getUInt16(buffer, offset + 4) / 16384.0;
+            float yscale = getUInt16(buffer, offset + 6) / 16384.0;
             offset += 8;
 
             for (int j = 0; j < child.numPoints; j++) {
@@ -331,14 +331,14 @@ Glyph parse_single_glyph(unsigned char* buffer,
     }
 
     // Read general glyph data
-    int16_t numberOfContours = getInt16(buffer, offset);
+    int16_t numberOfContours = getUInt16(buffer, offset);
 
     Glyph glyph;
     glyph.numberOfContours = numberOfContours;
-    glyph.xMin = getInt16(buffer, offset + 2);
-    glyph.yMin = getInt16(buffer, offset + 4);
-    glyph.xMax = getInt16(buffer, offset + 6);
-    glyph.yMax = getInt16(buffer, offset + 8);
+    glyph.xMin = getUInt16(buffer, offset + 2);
+    glyph.yMin = getUInt16(buffer, offset + 4);
+    glyph.xMax = getUInt16(buffer, offset + 6);
+    glyph.yMax = getUInt16(buffer, offset + 8);
     offset += 10;
 
     if (numberOfContours == 0) {

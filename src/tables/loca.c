@@ -20,10 +20,10 @@ void parse_loca(uint32_t* glyf_offsets,
         int offset;
         if (indexToLocFormat == 0) {
             // Short offset (convert to long offset)
-            offset = ((uint32_t) getInt16(buffer, loca->offset + i * 2)) * 2;
+            offset = ((uint32_t) getUInt16(buffer, loca->offset + i * 2)) * 2;
         } else {
             // Long offset
-            offset = getInt32(buffer, loca->offset + i * 4);
+            offset = getUInt32(buffer, loca->offset + i * 4);
         }
 
         glyf_offsets[i] = offset;

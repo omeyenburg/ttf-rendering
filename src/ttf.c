@@ -30,7 +30,7 @@ bool validateCheckSum(unsigned char* buffer, Table* table, uint32_t adjustment) 
 
     uint32_t sum = 0;
     for (int i = 0; i < full_parts; i++) {
-        sum += getInt32(buffer, table->offset + 4 * i);
+        sum += getUInt32(buffer, table->offset + 4 * i);
     }
 
     switch (remainder) {
@@ -38,10 +38,10 @@ bool validateCheckSum(unsigned char* buffer, Table* table, uint32_t adjustment) 
             sum += buffer[table->offset + 4 * full_parts] << 24;
             break;
         case 2:
-            sum += getInt16(buffer, table->offset + 4 * full_parts) << 16;
+            sum += getUInt16(buffer, table->offset + 4 * full_parts) << 16;
             break;
         case 3:
-            sum += getInt24(buffer, table->offset + 4 * full_parts) << 8;
+            sum += getUInt24(buffer, table->offset + 4 * full_parts) << 8;
             break;
     }
 
@@ -96,14 +96,14 @@ void load(char* path) {
     }
 
     // Check version
-    uint32_t version = getInt32(buffer, 0);
+    uint32_t version = getUInt32(buffer, 0);
     if (version != 65536) {
         fprintf(stderr, "Unexpected font version: %i\n", version);
         exit(1);
     }
 
     // Get number of tables
-    uint16_t numTables = getInt16(buffer, 4);
+    uint16_t numTables = getUInt16(buffer, 4);
 
     // Read table offsets
     Table cmap;
@@ -116,9 +116,9 @@ void load(char* path) {
     int buffer_offset = 12;
     for (int i = 0; i < numTables; i++) {
         const char* label = bytes4xchar(buffer, buffer_offset);
-        uint32_t checkSum = getInt32(buffer, buffer_offset + 4);
-        uint32_t offset = getInt32(buffer, buffer_offset + 8);
-        uint32_t length = getInt32(buffer, buffer_offset + 12);
+        uint32_t checkSum = getUInt32(buffer, buffer_offset + 4);
+        uint32_t offset = getUInt32(buffer, buffer_offset + 8);
+        uint32_t length = getUInt32(buffer, buffer_offset + 12);
 
         if (strcmp(label, "cmap") == 0) {
             cmap.initialized = true;
@@ -178,8 +178,10 @@ void load(char* path) {
 
     // Get horizontal metrics data
     uint16_t numberOfHMetrics = parse_hhea(buffer, &hhea);
-    printf("%i\n", numberOfHMetrics);
-    parse_hmtx(buffer, &hmtx);
+    uint16_t advanceWidth[numberOfHMetrics];
+    int16_t leftSideBearings[numGlyphs];
+    parse_hmtx(
+        advanceWidth, leftSideBearings, buffer, &hmtx, numberOfHMetrics, numGlyphs);
 
     // Close font file and deallocate buffer
     fclose(fp);

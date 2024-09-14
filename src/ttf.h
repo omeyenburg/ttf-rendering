@@ -37,13 +37,15 @@ typedef struct {
     uint16_t* endPtsOfContours;
 } Glyph;
 
-#define getInt16(buffer, offset)                                                       \
+#define getUInt16(buffer, offset)                                                      \
     (((unsigned char) buffer[offset] << 8) | ((unsigned char) buffer[offset + 1]))
-#define getInt24(buffer, offset)                                                       \
+#define getInt16(buffer, offset)                                                       \
+    (((char) buffer[offset] << 8) | ((char) buffer[offset + 1]))
+#define getUInt24(buffer, offset)                                                      \
     ((unsigned char) buffer[offset] << 16) |                                           \
         ((unsigned char) buffer[offset + 1] << 8) |                                    \
         ((unsigned char) buffer[offset + 2])
-#define getInt32(buffer, offset)                                                       \
+#define getUInt32(buffer, offset)                                                      \
     (((unsigned char) buffer[offset] << 24) |                                          \
      ((unsigned char) buffer[offset + 1] << 16) |                                      \
      ((unsigned char) buffer[offset + 2] << 8) | ((unsigned char) buffer[offset + 3]))
@@ -62,7 +64,12 @@ void parse_glyf(Glyph* glyphs,
                 uint16_t numGlyphs);
 int16_t parse_head(unsigned char* buffer, Table* head);
 uint16_t parse_hhea(unsigned char* buffer, Table* hhea);
-void parse_hmtx(unsigned char* buffer, Table* hmtx);
+void parse_hmtx(uint16_t* advanceWidth,
+                int16_t* leftSideBearings,
+                unsigned char* buffer,
+                Table* hmtx,
+                uint16_t numberOfHMetrics,
+                uint16_t numGlyphs);
 void parse_loca(uint32_t* glyf_offsets,
                 unsigned char* buffer,
                 Table* loca,
