@@ -109,6 +109,7 @@ void load(char* path) {
     Table cmap;
     Table glyf;
     Table head;
+    Table hhea;
     Table hmtx;
     Table loca;
     Table maxp;
@@ -134,6 +135,11 @@ void load(char* path) {
             head.checkSum = checkSum;
             head.offset = offset;
             head.length = length;
+        } else if (strcmp(label, "hhea") == 0) {
+            hhea.initialized = true;
+            hhea.checkSum = checkSum;
+            hhea.offset = offset;
+            hhea.length = length;
         } else if (strcmp(label, "hmtx") == 0) {
             hmtx.initialized = true;
             hmtx.checkSum = checkSum;
@@ -165,10 +171,14 @@ void load(char* path) {
     uint16_t numChars = get_cmap_size(buffer, &cmap);
     CharacterMap charMap[numChars];
 
-    // Get font data
+    // Get glyph data
     parse_loca(glyf_offsets, buffer, &loca, numGlyphs, indexToLocFormat);
     parse_glyf(glyphs, buffer, &glyf, glyf_offsets, numGlyphs);
     parse_cmap(charMap, buffer, &cmap, numChars);
+
+    // Get horizontal metrics data
+    uint16_t numberOfHMetrics = parse_hhea(buffer, &hhea);
+    printf("%i\n", numberOfHMetrics);
     parse_hmtx(buffer, &hmtx);
 
     // Close font file and deallocate buffer

@@ -50,23 +50,24 @@ typedef struct {
 
 bool validateCheckSum(unsigned char* buffer, Table* table, uint32_t adjustment);
 void load(char* path);
-int16_t parse_head(unsigned char* buffer, Table* head);
-uint16_t parse_maxp(unsigned char* buffer, Table* maxp);
-void parse_loca(uint32_t* glyf_offsets,
-                unsigned char* buffer,
-                Table* loca,
-                uint16_t numGlyphs,
-                int16_t indexToLocFormat);
-void parse_glyf(Glyph* glyphs,
-                unsigned char* buffer,
-                Table* glyf,
-                uint32_t* glyf_offsets,
-                uint16_t numGlyphs);
 uint16_t get_cmap_size(unsigned char* buffer, Table* cmap);
 void parse_cmap(CharacterMap* charMap,
                 unsigned char* buffer,
                 Table* cmap,
                 uint16_t numChars);
+void parse_glyf(Glyph* glyphs,
+                unsigned char* buffer,
+                Table* glyf,
+                uint32_t* glyf_offsets,
+                uint16_t numGlyphs);
+int16_t parse_head(unsigned char* buffer, Table* head);
+uint16_t parse_hhea(unsigned char* buffer, Table* hhea);
 void parse_hmtx(unsigned char* buffer, Table* hmtx);
+void parse_loca(uint32_t* glyf_offsets,
+                unsigned char* buffer,
+                Table* loca,
+                uint16_t numGlyphs,
+                int16_t indexToLocFormat);
+uint16_t parse_maxp(unsigned char* buffer, Table* maxp);
 
 #endif // TTF_H
