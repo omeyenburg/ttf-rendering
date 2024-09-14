@@ -6,32 +6,30 @@ void parse_simple_glyph(Glyph* glyph,
                         int16_t numberOfContours) {
     // Allocate end points
     glyph->endPtsOfContours = (uint16_t*) malloc(numberOfContours * sizeof(uint16_t));
-
-    // Check if memory allocation was successful
     if (glyph->endPtsOfContours == NULL) {
         fprintf(stderr, "Failed to allocate memory for glyph points.\n");
         exit(1);
     }
 
-    // Populate end points and get total number of points from last index
-    // uint32_t num_points;
+    // Populate end points
     for (int j = 0; j < numberOfContours; j++) {
         uint16_t index = getInt16(buffer, offset + 2 * j);
         glyph->endPtsOfContours[j] = index;
-        // num_points = index;
     }
+
+    // Get number of points from last end point of contours
     uint32_t num_points = glyph->endPtsOfContours[numberOfContours - 1] + 1;
     glyph->numPoints = num_points;
 
-    // Skip instructions
+    // Skip instructions section
     uint16_t instructionLength = getInt16(buffer, offset + 2 * numberOfContours);
     offset += 2 + 2 * numberOfContours + instructionLength;
 
     uint8_t flags[num_points];
     uint8_t repeat = 0;
     uint32_t y_offset = 0;
-
     for (int j = 0; j < num_points; j++) {
+        // Repeat last flag
         if (repeat > 0) {
             flags[j] = flags[j - 1];
             if (flags[j] & 0x02) {
@@ -44,16 +42,20 @@ void parse_simple_glyph(Glyph* glyph,
         }
 
         flags[j] = buffer[offset];
-        if (flags[j] &
-            0x02) { // Shift start of y coordinates back depending on x coordinate size
+
+        // Shift start of y coordinates back depending on x coordinate size
+        if (flags[j] & 0x02) {
             y_offset += 1;
         } else if (!(flags[j] & 0x10)) {
             y_offset += 2;
         }
+
+        // Check repeat flag
         if (flags[j] & 0x08) {
             offset += 1;
             repeat = buffer[offset];
         }
+
         offset += 1;
     }
 
@@ -63,7 +65,6 @@ void parse_simple_glyph(Glyph* glyph,
     // Allocate points
     glyph->points = (Point*) malloc(num_points * sizeof(Point));
     if (glyph->points == NULL) {
-        // Handle memory allocation failure (optional)
         fprintf(stderr, "Failed to allocate memory for glyph points.\n");
         exit(1);
     }
@@ -126,11 +127,11 @@ void parse_compound_glyph(Glyph* glyph,
                           uint32_t offset,
                           uint32_t* glyf_offsets,
                           uint16_t numGlyphs) {
-    uint32_t counting_offset = offset;
-    uint16_t numCompounds = 0;
+    // Count compounds
     uint16_t flags;
+    uint16_t numCompounds = 0;
+    uint32_t counting_offset = offset;
     do {
-        numCompounds++;
         flags = getInt16(buffer, counting_offset);
         counting_offset += 4;
 
@@ -155,6 +156,7 @@ void parse_compound_glyph(Glyph* glyph,
             counting_offset += 8;
         }
 
+        numCompounds++;
         // Continue looping if the MORE_COMPONENTS flag (0x0020) is set
     } while (flags & 0x0020);
 
@@ -217,6 +219,8 @@ void parse_compound_glyph(Glyph* glyph,
                 child.points[j].x += arg1;
                 child.points[j].y += arg2;
             }
+
+            printf("Compound glyph uses transformation matrix! (Offset %i)\n", offset);
 
             // TODO: Testing needed! do some prints if any font even uses this feature
         }
@@ -298,10 +302,19 @@ void parse_compound_glyph(Glyph* glyph,
     }
 
     uint16_t point_index = 0;
+    uint16_t end_point_index = 0;
     for (int i = 0; i < numCompounds; i++) {
+        // Copy points and end points into glyph
         for (int j = 0; j < compound_length[i]; j++) {
             glyph->points[point_index++] = compound_points[i][j];
         }
+        for (int j = 0; j < compound_end_length[i]; j++) {
+            glyph->endPtsOfContours[end_point_index++] = compound_end_points[i][j];
+        }
+
+        // Deallocation
+        free(compound_points[i]);
+        free(compound_end_points[i]);
     }
 }
 
@@ -324,16 +337,11 @@ Glyph parse_single_glyph(unsigned char* buffer,
     glyph.yMin = getInt16(buffer, offset + 4);
     glyph.xMax = getInt16(buffer, offset + 6);
     glyph.yMax = getInt16(buffer, offset + 8);
-    // printf("%i\n", numberOfContours);
-    // if (index == 36) {
-    //     printf("Box: %i, %i, %i, %i\n", glyph.xMin, glyph.yMin, glyph.xMax,
-    //     glyph.yMax);
-    // }
     offset += 10;
 
     if (numberOfContours == 0) {
-        // printf("No contours for glyph %i.\n", index); // it's ok if some glyphs have
-        // no contours, don't print to avoid spamming
+        // Empty glyph
+        printf("No contours for glyph %i.\n", index);
     } else if (numberOfContours > 0) {
         // Simple glyph
         parse_simple_glyph(&glyph, buffer, offset, numberOfContours);
@@ -341,14 +349,9 @@ Glyph parse_single_glyph(unsigned char* buffer,
         // Compound glyph
         parse_compound_glyph(&glyph, buffer, glyf, offset, glyf_offsets, numGlyphs);
     } else {
-        // fprintf(
-        //     stderr, "Encountered unexpected numberOfContours: %i.\n",
-        //     numberOfContours);
-        // exit(1);
-        // fprintf(stderr, "Ignoring this error.\n");
-        //
-        // We don't print here, it is too much output... TODO: check if this is fixed
-        // later
+        fprintf(
+            stderr, "Encountered unexpected numberOfContours: %i.\n", numberOfContours);
+        exit(1);
     }
 
     return glyph;
