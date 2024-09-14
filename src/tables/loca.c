@@ -10,6 +10,11 @@ void parse_loca(uint32_t* glyf_offsets,
         exit(1);
     }
 
+    if (!validateCheckSum(buffer, loca, 0)) {
+        fprintf(stderr, "Invalid check sum for table \"loca\"!\n");
+        exit(1);
+    }
+
     // Populate glyf offsets
     for (int i = 0; i < numGlyphs; i++) {
         int offset;

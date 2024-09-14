@@ -24,6 +24,33 @@ uint16_t unicode(unsigned char* c) {
     }
 }
 
+bool validateCheckSum(unsigned char* buffer, Table* table, uint32_t adjustment) {
+    uint32_t full_parts = table->length / 4;
+    uint32_t remainder = table->length - full_parts * 4;
+
+    uint32_t sum = 0;
+    for (int i = 0; i < full_parts; i++) {
+        sum += getInt32(buffer, table->offset + 4 * i);
+    }
+
+    switch (remainder) {
+        case 1:
+            sum += buffer[table->offset + 4 * full_parts] << 24;
+            break;
+        case 2:
+            sum += getInt16(buffer, table->offset + 4 * full_parts) << 16;
+            break;
+        case 3:
+            sum += getInt24(buffer, table->offset + 4 * full_parts) << 8;
+            break;
+    }
+
+    // Necessary for head table
+    sum -= adjustment;
+
+    return sum == table->checkSum;
+}
+
 void load(char* path) {
     printf("Loading font %s\n", path);
 

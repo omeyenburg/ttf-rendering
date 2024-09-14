@@ -14,10 +14,10 @@ typedef struct {
 } CharacterMap;
 
 typedef struct {
-    int initialized;
-    long checkSum;
-    long offset;
-    long length;
+    bool initialized;
+    uint32_t checkSum;
+    uint32_t offset;
+    uint32_t length;
 } Table;
 
 typedef struct {
@@ -39,11 +39,16 @@ typedef struct {
 
 #define getInt16(buffer, offset)                                                       \
     (((unsigned char) buffer[offset] << 8) | ((unsigned char) buffer[offset + 1]))
+#define getInt24(buffer, offset)                                                       \
+    ((unsigned char) buffer[offset] << 16) |                                           \
+        ((unsigned char) buffer[offset + 1] << 8) |                                    \
+        ((unsigned char) buffer[offset + 2])
 #define getInt32(buffer, offset)                                                       \
     (((unsigned char) buffer[offset] << 24) |                                          \
      ((unsigned char) buffer[offset + 1] << 16) |                                      \
      ((unsigned char) buffer[offset + 2] << 8) | ((unsigned char) buffer[offset + 3]))
 
+bool validateCheckSum(unsigned char* buffer, Table* table, uint32_t adjustment);
 void load(char* path);
 int16_t parse_head(unsigned char* buffer, Table* head);
 uint16_t parse_maxp(unsigned char* buffer, Table* maxp);

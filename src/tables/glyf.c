@@ -369,6 +369,11 @@ void parse_glyf(Glyph* glyphs,
         exit(1);
     }
 
+    if (!validateCheckSum(buffer, glyf, 0)) {
+        fprintf(stderr, "Invalid check sum for table \"glyf\"!\n");
+        exit(1);
+    }
+
     for (int i = 0; i < numGlyphs; i++) {
         glyphs[i] = parse_single_glyph(buffer, glyf, glyf_offsets, numGlyphs, i);
         // printf("Index %i\thas %i points\n", i, glyphs[i].numPoints);

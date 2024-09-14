@@ -65,6 +65,11 @@ void parse_cmap(CharacterMap* charMap,
         exit(1);
     }
 
+    if (!validateCheckSum(buffer, cmap, 0)) {
+        fprintf(stderr, "Invalid check sum for table \"cmap\"!\n");
+        exit(1);
+    }
+
     u_int16_t version = getInt16(buffer, cmap->offset);
     if (version != 0) {
         fprintf(stderr, "Expected CMAP version 0, got %i.", version);
