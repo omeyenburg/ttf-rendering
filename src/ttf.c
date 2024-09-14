@@ -182,6 +182,11 @@ void load(char* path) {
     int16_t leftSideBearings[numGlyphs];
     parse_hmtx(
         advanceWidth, leftSideBearings, buffer, &hmtx, numberOfHMetrics, numGlyphs);
+    // DOCS: As an optimization, the number of records can be less than the number of
+    // glyphs, in which case the advance width value of the last record applies to all
+    // remaining glyph IDs. This can be useful in monospaced fonts, or in fonts that
+    // have a large number of glyphs with the same advance width (provided the glyphs
+    // are ordered appropriately).
 
     // Close font file and deallocate buffer
     fclose(fp);
