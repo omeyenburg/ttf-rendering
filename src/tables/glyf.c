@@ -323,12 +323,14 @@ Glyph parse_single_glyph(unsigned char* buffer,
                          uint32_t* glyf_offsets,
                          uint16_t numGlyphs,
                          uint16_t index) {
+    // Check offset
     uint32_t offset = glyf->offset + glyf_offsets[index];
     if (offset >= glyf->offset + glyf->length) {
         fprintf(stderr, "Glyph offset out of range for glyph index %d\n", index);
         exit(1);
     }
 
+    // Read general glyph data
     int16_t numberOfContours = getInt16(buffer, offset);
 
     Glyph glyph;
