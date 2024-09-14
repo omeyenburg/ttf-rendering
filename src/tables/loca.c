@@ -10,20 +10,17 @@ void parse_loca(uint32_t* glyf_offsets,
         exit(1);
     }
 
+    // Populate glyf offsets
     for (int i = 0; i < numGlyphs; i++) {
         int offset;
         if (indexToLocFormat == 0) {
-            // Short offsets
+            // Short offset (convert to long offset)
             offset = ((uint32_t) getInt16(buffer, loca->offset + i * 2)) * 2;
         } else {
-            // Long offsets
+            // Long offset
             offset = getInt32(buffer, loca->offset + i * 4);
         }
 
         glyf_offsets[i] = offset;
     }
-
-    printf("Loca length: %i == %i ?\n",
-           loca->length,
-           numGlyphs * (indexToLocFormat == 0 ? 2 : 4));
 }
