@@ -15,6 +15,11 @@ typedef uint16_t uFWord;   // Unsigned 16-bit integer
 typedef int16_t shortFrac; // 0.16 signed fixed-point
 
 typedef struct {
+    uint16_t unicode;
+    uint16_t index;
+} CharacterMap;
+
+typedef struct {
     int initialized;
     long checkSum;
     long offset;
@@ -58,10 +63,11 @@ void parse_glyf(Glyph* glyphs,
                 Table* glyf,
                 uint32_t* glyf_offsets,
                 uint16_t numGlyphs);
-void parse_cmap(uint32_t characters[],
+uint16_t get_cmap_size(unsigned char* buffer, Table* cmap);
+void parse_cmap(CharacterMap* charMap,
                 unsigned char* buffer,
                 Table* cmap,
-                uint32_t glyf_offset[]);
+                uint16_t numChars);
 void parse_htmx(unsigned char* buffer, Table* htmx);
 
 #endif // TTF_H

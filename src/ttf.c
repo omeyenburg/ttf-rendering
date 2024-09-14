@@ -10,6 +10,20 @@ char* bytes4xchar(unsigned char* buffer, int offset) {
     return string;
 }
 
+uint16_t unicode(unsigned char* c) {
+    if ((c[0] >> 7) == 0) {
+        // 1-byte character (ASCII)
+        return c[0];
+    } else if ((c[0] >> 5) == 0b110) {
+        // 2-byte character
+        return ((c[0] & 0x1F) << 6) | (c[1] & 0x3F);
+    } else {
+        fprintf(stderr,
+                "Unsupported unicode character size. Only 1 and 2 bytes allowed.\n");
+        exit(1);
+    }
+}
+
 void load(char* path) {
     printf("Loading font %s\n", path);
 
@@ -123,20 +137,25 @@ void load(char* path) {
     // Relative offsets in glyf; first index used for missing character glyph
     uint32_t glyf_offsets[numGlyphs];
     Glyph glyphs[numGlyphs];
-    uint32_t characters[255];
+
+    uint16_t numChars = get_cmap_size(buffer, &cmap);
+    CharacterMap charMap[numChars];
 
     parse_loca(glyf_offsets, buffer, &loca, numGlyphs, indexToLocFormat);
     parse_glyf(glyphs, buffer, &glyf, glyf_offsets, numGlyphs);
-    parse_cmap(characters, buffer, &cmap, glyf_offsets);
+    parse_cmap(charMap, buffer, &cmap, numChars);
     parse_htmx(buffer, &htmx);
 
     fclose(fp);
     free(buffer);
 
     int n = 0;
-    for (int i = 0; i < 255; i++) {
-        if (i == '¨') {
-            n = characters[i];
+    unsigned char c[] = "Ä";
+    uint16_t u = unicode(c);
+    printf("%s has unicode value %i\n", c, u);
+    for (int i = 0; i < numChars; i++) {
+        if (charMap[i].unicode == u) {
+            n = charMap[i].index;
             break;
         }
     }
@@ -147,6 +166,6 @@ void load(char* path) {
         printf("(%i, %i), ", glyphs[n].points[i].x, glyphs[n].points[i].y);
     }
     printf("\n");
-    printf("A has %i points\n", glyphs[n].numPoints);
-    printf("A has %i contours\n", glyphs[n].numberOfContours);
+    printf("%s has %i points\n", c, glyphs[n].numPoints);
+    printf("%s has %i contours\n", c, glyphs[n].numberOfContours);
 }
