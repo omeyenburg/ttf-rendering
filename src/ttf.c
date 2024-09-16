@@ -203,6 +203,11 @@ void load(char* path) {
         }
     }
 
+    // TODO: Add points directly in the center between consecutive offCurve points
+    //       to turn cubic beziers into quadratic beziers.
+    //       Maybe even add offCurve points between onCurve points to reduce shader
+    //       branching. Might be irrelevant due to looping over lines/beziers.
+
     // Print out points of glyph n
     for (int i = 0; i < glyphs[n].numPoints; i++) {
         printf("(%i, %i), ", glyphs[n].points[i].x, glyphs[n].points[i].y);
