@@ -1,6 +1,6 @@
 #include "window.h"
-#include <GL/gl.h>
-#include <SDL2/SDL.h>
+
+#define nullptr (void*) 0
 
 int create_window() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
@@ -34,7 +34,9 @@ int create_window() {
         SDL_Quit();
         return 1;
     }
-    SDL_GL_SetSwapInterval(1); // Enable vsync
+
+    // Enable vsync
+    SDL_GL_SetSwapInterval(1);
 
     // Create an OpenGL context
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
@@ -55,19 +57,54 @@ int create_window() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // glEnable(GL_DEPTH_TEST);              // Enable depth testing TODO: needed?
 
-    const char* vertex_code = "#version 330 core\n"
-                              "layout(location=0) in vec2 vp;"
-                              "void main() {"
-                              "   gl_Position = vec4(vp, 0, 1);"
-                              "}";
+    // Open file
+    FILE* fp;
+    fp = fopen("resources/shader/vertex.glsl", "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open file.\n");
+        exit(1);
+    }
 
-    const char* fragment_code = "#version 330 core\n"
-                                ""
-                                "out vec4 FragColor;"
-                                ""
-                                "void main() {"
-                                "   FragColor = vec4(1, 1, 1, 1);"
-                                "}";
+    // Get file size
+    fseek(fp, 0L, SEEK_END);
+    int size = ftell(fp);
+    fseek(fp, 0L, SEEK_SET); // or use rewind(fp);
+
+    // Allocate memory for the shader code
+    char* vertex_code =
+        (char*) malloc((size + 1) * sizeof(char)); // +1 for null terminator
+    if (vertex_code == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(1);
+    }
+
+    // Read the file contents into the allocated memory
+    size_t read_size = fread(vertex_code, sizeof(char), size, fp);
+    vertex_code[read_size] = '\0'; // Null-terminate the string
+
+    // Open file
+    fp = fopen("resources/shader/fragment.glsl", "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open file.\n");
+        exit(1);
+    }
+
+    // Get file size
+    fseek(fp, 0L, SEEK_END);
+    size = ftell(fp);
+    fseek(fp, 0L, SEEK_SET); // or use rewind(fp);
+
+    // Allocate memory for the shader code
+    char* fragment_code =
+        (char*) malloc((size + 1) * sizeof(char)); // +1 for null terminator
+    if (fragment_code == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(1);
+    }
+
+    // Read the file contents into the allocated memory
+    read_size = fread(fragment_code, sizeof(char), size, fp);
+    fragment_code[read_size] = '\0'; // Null-terminate the string
 
     // Create a shader program
     GLint gl_status;
@@ -75,14 +112,14 @@ int create_window() {
 
     // Create a vertex shader
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_code, NULL);
+    glShaderSource(vertex_shader, 1, &vertex_code, nullptr);
     glCompileShader(vertex_shader);
     glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &gl_status);
     if (gl_status != GL_TRUE) {
         GLint log_length = 0;
         glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
         GLchar* message = (GLchar*) malloc(log_length);
-        glGetShaderInfoLog(vertex_shader, log_length, NULL, message);
+        glGetShaderInfoLog(vertex_shader, log_length, nullptr, message);
         fprintf(stderr, "Vertex shader compilation failed:\n%s\n", message);
         free(message);
         exit(1);
@@ -91,14 +128,14 @@ int create_window() {
 
     // Create a fragment shader
     GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_code, NULL);
+    glShaderSource(fragment_shader, 1, &fragment_code, nullptr);
     glCompileShader(fragment_shader);
     glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &gl_status);
     if (gl_status != GL_TRUE) {
         GLint log_length = 0;
         glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
         GLchar* message = (GLchar*) malloc(log_length);
-        glGetShaderInfoLog(fragment_shader, log_length, NULL, message);
+        glGetShaderInfoLog(fragment_shader, log_length, nullptr, message);
         fprintf(stderr, "Fragment shader compilation failed:\n%s\n", message);
         free(message);
         exit(1);
@@ -144,8 +181,7 @@ int create_window() {
 
     // Vertices
     glEnableVertexAttribArray(0);
-    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), NULL);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void*) 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
 
     // Indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -170,7 +206,7 @@ int create_window() {
         // Clear the screen and depth buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         // Swap the window buffers
         SDL_GL_SwapWindow(window);
