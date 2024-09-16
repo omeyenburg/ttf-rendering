@@ -5,7 +5,9 @@
 int main(void) {
     // load("resources/ComicMono.ttf");
     load("resources/Ubuntu.ttf");
-    create_window();
+    Window window = create_window();
+    run(&window);
+    quit(&window);
 
     return 0;
 }
