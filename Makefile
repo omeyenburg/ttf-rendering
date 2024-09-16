@@ -1,8 +1,8 @@
 .PHONY: build
 
 CC = gcc
-CFLAGS = -Wall -g
-LDFLAGS = $(shell pkg-config --cflags --libs sdl2 gl)
+CFLAGS = -Wall -g -Wno-implicit-function-declaration
+LDFLAGS = $(shell pkg-config --cflags --libs sdl2 gl glew)
 SRCS = $(shell find src -name '*.c')
 TARGET = build/main
 

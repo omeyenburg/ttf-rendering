@@ -1,2 +1,4 @@
 CompileFlags:
-  Add: [-I/usr/include/SDL2]
+  Add:
+    - -I/usr/include/SDL2
+    - -I/usr/include/GL
