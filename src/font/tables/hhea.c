@@ -1,4 +1,6 @@
-#include "../ttf.h"
+#include "font/tables/hhea.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 uint16_t parse_hhea(unsigned char* buffer, Table* hhea) {
     if (!hhea->initialized) {

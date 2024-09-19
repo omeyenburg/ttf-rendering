@@ -1,4 +1,6 @@
-#include "../ttf.h"
+#include "font/tables/loca.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void parse_loca(uint32_t* glyf_offsets,
                 unsigned char* buffer,

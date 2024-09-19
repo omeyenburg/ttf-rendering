@@ -1,13 +1,7 @@
-#include "ttf.h"
-#include "window.h"
-#include <stdio.h>
+#include "graphics/window.h"
 
-int main(void) {
-    // load("resources/ComicMono.ttf");
-    load("resources/Ubuntu.ttf");
+int main() {
     Window window = create_window();
     run(&window);
     quit(&window);
-
-    return 0;
 }

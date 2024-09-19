@@ -1,4 +1,6 @@
-#include "../ttf.h"
+#include "font/tables/head.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 int16_t parse_head(unsigned char* buffer, Table* head) {
     if (!head->initialized) {

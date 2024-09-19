@@ -1,4 +1,6 @@
-#include "../ttf.h"
+#include "font/tables/maxp.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 uint16_t parse_maxp(unsigned char* buffer, Table* maxp) {
     if (!maxp->initialized) {

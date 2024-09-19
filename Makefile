@@ -1,17 +1,18 @@
-.PHONY: build
+.PHONY: build compile
 
-CC = gcc
+CC = clang
 CFLAGS = -Wall -g -Wno-implicit-function-declaration
-LDFLAGS = $(shell pkg-config --cflags --libs sdl2 gl glew)
+LDFLAGS = -I./include/ -I/usr/include/GL $(shell pkg-config --cflags --libs sdl2 gl)
 SRCS = $(shell find src -name '*.c')
 TARGET = build/main
 
-build:
+compile:
 	@mkdir -p build
 	@$(CC) $(SRCS) $(CFLAGS) -o $(TARGET) $(LDFLAGS)
+
+build: compile
 	@echo 'Successfully compiled SDL project! Run it using "build/main".'
-run:
-	@mkdir -p build
-	@$(CC) $(SRCS) $(CFLAGS) -o $(TARGET) $(LDFLAGS)
+
+run: compile
 	@echo 'Successfully compiled SDL project! Executing "build/main"...'
 	@./build/main

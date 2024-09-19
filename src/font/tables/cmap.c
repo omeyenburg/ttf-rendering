@@ -1,4 +1,6 @@
-#include "../ttf.h"
+#include "font/tables/cmap.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 uint16_t get_cmap_size(unsigned char* buffer, Table* cmap) {
     if (!cmap->initialized) {

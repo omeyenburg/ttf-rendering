@@ -1,4 +1,6 @@
-#include "../ttf.h"
+#include "font/tables/hmtx.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void parse_hmtx(uint16_t* advanceWidth,
                 int16_t* leftSideBearings,

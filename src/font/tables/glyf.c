@@ -1,4 +1,6 @@
-#include "glyf.h"
+#include "font/tables/glyf.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void parse_simple_glyph(Glyph* glyph,
                         unsigned char* buffer,
