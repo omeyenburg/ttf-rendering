@@ -1,8 +1,16 @@
 #include "font/ttf.h"
 #include "font/font.h"
+#include "font/tables/cmap.h"
+#include "font/tables/glyf.h"
+#include "font/tables/head.h"
+#include "font/tables/hhea.h"
+#include "font/tables/hmtx.h"
+#include "font/tables/loca.h"
+#include "font/tables/maxp.h"
 #include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void load_ttf(char* path) {
     printf("Loading font %s\n", path);
@@ -117,6 +125,9 @@ void load_ttf(char* path) {
     uint16_t numGlyphs = parse_maxp(buffer, &maxp);
 
     // Relative offsets in glyf
+    // TODO: Remove such stack allocations, especially for large arrays. This syntax is
+    // only intended for sizes known at compile time, e.g. `int arr[10]`; instead use
+    // the heap using `malloc()`
     uint32_t glyf_offsets[numGlyphs];
     Glyph glyphs[numGlyphs];
 
@@ -166,6 +177,51 @@ void load_ttf(char* path) {
         printf("(%i, %i), ", glyphs[n].points[i].x, glyphs[n].points[i].y);
     }
     printf("\n");
+
+    /*
+
+    TODO: What to do if there are more than 2¹⁶ points?
+
+    Tex0: Red, 16 bit, Int, size = 3 + 2 * numGlyphs + numContours
+    int:                numGlyhps + 1
+    int[numGlyphs + 1]: |index| in Tex1 to Glyph points; positive sign = onCurve TODO:
+    fix: glyph's first point + length int[numGlyphs + 1]: |index| in Tex2 to Glyph end
+    point indices, 0 = None int[numContours]:   end point index of Glyph points
+
+    Tex1: Red+Green, 16 bit, Float, size = numPoints
+    vec2[numPoints]:    x and y position of each point
+
+    TODO: LATER WITH SECTIONS
+    - 2 columns and n rows -> 2*n rectangles
+
+    */
+
+    // Count missing onCurve points between two offCurve Points
+    uint32_t newNumPoints = 0;
+    uint32_t numPoints = 0;
+    for (int i = 0; i < numGlyphs; i++) {
+        Glyph* glyph = &glyphs[i];
+        for (int j = 0; j < glyph->numberOfContours; j++) {
+            int k_start = (j == 0) ? 0 : (glyph->endPtsOfContours[j - 1] + 1);
+            int k_end = glyph->endPtsOfContours[j] + 1;
+            if (i == 36) {
+                printf("%i, %i, \n", k_start, k_end);
+            }
+            for (int k = k_start; k < k_end; k++) {
+                int k_last = (k == k_start) ? (k_end - 1) : (k - 1);
+                if (!glyph->points[k].onCurve && !glyph->points[k_last].onCurve) {
+                    newNumPoints += 1;
+                }
+                numPoints += 1;
+            }
+        }
+    }
+
+    printf("Added %i points; %i.\n", newNumPoints, numPoints);
+
+    // Allocate texture data arrays
+    int tex0_size;
+    int tex1_size;
 
     // Deallocate memory
     for (int i = 0; i < numGlyphs; i++) {
