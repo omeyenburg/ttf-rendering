@@ -182,14 +182,29 @@ void load_ttf(char* path) {
 
     TODO: What to do if there are more than 2¹⁶ points?
 
-    Tex0: Red, 16 bit, Int, size = 3 + 2 * numGlyphs + numContours
+    Tex0: Red, 16 bit, int, size = 3 + 2 * numGlyphs + numContours
     int:                numGlyhps + 1
-    int[numGlyphs + 1]: |index| in Tex1 to Glyph points; positive sign = onCurve TODO:
-    fix: glyph's first point + length int[numGlyphs + 1]: |index| in Tex2 to Glyph end
-    point indices, 0 = None int[numContours]:   end point index of Glyph points
+    int[numGlyphs + 1]: |index| in Tex1 to Glyph points; positive sign = onCurve
+    TODO: fix: glyph's first point + length
 
-    Tex1: Red+Green, 16 bit, Float, size = numPoints
+    int[numGlyphs + 1]: |index| in Tex2 to Glyph end point indices, 0 = None
+    int[numContours]:   end point index of Glyph points
+
+    Tex1: Red+Green, 16 bit, float, size = numPoints
     vec2[numPoints]:    x and y position of each point
+
+    # NOTE: IMPROVED VERSION
+
+    Tex0: Red, 16 bit, unsigned int, size = 3 + 2 * numGlyphs
+    int:                numGlyhps + 1
+    int[numGlyphs + 1]: index/2 in Tex1 to Glyph points
+
+    Tex1: Red+Green, 16 bit, Float, size = variable; >= numPoints
+    vec2[variable]:    x and y position of each point
+    -> negative sign of x: off curve point
+    -> negative sign of y: end of contour point
+    -> all Glyphs have even number of points; additional point added for 16 bit index
+
 
     TODO: LATER WITH SECTIONS
     - 2 columns and n rows -> 2*n rectangles
