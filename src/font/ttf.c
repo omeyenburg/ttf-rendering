@@ -125,11 +125,8 @@ void load_ttf(char* path) {
     uint16_t numGlyphs = parse_maxp(buffer, &maxp);
 
     // Relative offsets in glyf
-    // TODO: Remove such stack allocations, especially for large arrays. This syntax is
-    // only intended for sizes known at compile time, e.g. `int arr[10]`; instead use
-    // the heap using `malloc()`
-    uint32_t glyf_offsets[numGlyphs];
-    Glyph glyphs[numGlyphs];
+    uint32_t* glyf_offsets = (uint32_t*) malloc(sizeof(uint32_t) * numGlyphs);
+    Glyph* glyphs = (Glyph*) malloc(sizeof(Glyph) * numGlyphs);
 
     // Get number of mapped characters
     uint16_t numChars = get_cmap_size(buffer, &cmap);
@@ -138,14 +135,23 @@ void load_ttf(char* path) {
     // Get glyph data
     parse_loca(glyf_offsets, buffer, &loca, numGlyphs, indexToLocFormat);
     parse_glyf(glyphs, buffer, &glyf, glyf_offsets, numGlyphs);
+
+    // Deallocate memory for offests in glyf table
+    free(glyf_offsets);
+
     parse_cmap(charMap, buffer, &cmap, numChars);
 
     // Get horizontal metrics data
     uint16_t numberOfHMetrics = parse_hhea(buffer, &hhea);
-    uint16_t advanceWidth[numberOfHMetrics];
-    int16_t leftSideBearings[numGlyphs];
+
+    // Allocate Arrays for hmtx output
+    // TODO: these are not yet used.
+    uint16_t* advanceWidth = (uint16_t*) malloc(sizeof(uint16_t) * numberOfHMetrics);
+    int16_t* leftSideBearings = (int16_t*) malloc(sizeof(int16_t) * numGlyphs);
+
     parse_hmtx(
         advanceWidth, leftSideBearings, buffer, &hmtx, numberOfHMetrics, numGlyphs);
+
     // DOCS: As an optimization, the number of records can be less than the number of
     // glyphs, in which case the advance width value of the last record applies to all
     // remaining glyph IDs. This can be useful in monospaced fonts, or in fonts that
@@ -183,7 +189,7 @@ void load_ttf(char* path) {
     TODO: What to do if there are more than 2¹⁶ points?
 
     Tex0: Red, 16 bit, int, size = 3 + 2 * numGlyphs + numContours
-    int:                numGlyhps + 1
+    int:                numGlyphs + 1
     int[numGlyphs + 1]: |index| in Tex1 to Glyph points; positive sign = onCurve
     TODO: fix: glyph's first point + length
 
@@ -196,7 +202,7 @@ void load_ttf(char* path) {
     # NOTE: IMPROVED VERSION
 
     Tex0: Red, 16 bit, unsigned int, size = 3 + 2 * numGlyphs
-    int:                numGlyhps + 1
+    int:                numGlyphs + 1
     int[numGlyphs + 1]: index/2 in Tex1 to Glyph points
 
     Tex1: Red+Green, 16 bit, Float, size = variable; >= numPoints
@@ -239,8 +245,12 @@ void load_ttf(char* path) {
     int tex1_size;
 
     // Deallocate memory
+    free(advanceWidth);
+    free(leftSideBearings);
+
     for (int i = 0; i < numGlyphs; i++) {
         free(glyphs[i].points);
         free(glyphs[i].endPtsOfContours);
     }
+    free(glyphs);
 }
