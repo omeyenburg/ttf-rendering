@@ -47,6 +47,7 @@ void load_ttf(char* path) {
         exit(1);
     }
 
+    // Read file content into buffer
     if (fread(buffer, 1, size, fp) != size) {
         printf(
             "Error: There was an error reading the file %s \nUnexpected file size.\n",
@@ -128,6 +129,17 @@ void load_ttf(char* path) {
     uint32_t* glyf_offsets = (uint32_t*) malloc(sizeof(uint32_t) * numGlyphs);
     Glyph* glyphs = (Glyph*) malloc(sizeof(Glyph) * numGlyphs);
 
+    // Check if malloc was successful
+    if (glyf_offsets == NULL) {
+        printf("Error: Memory allocation failed.\n");
+        exit(1);
+    }
+
+    if (glyphs == NULL) {
+        printf("Error: Memory allocation failed.\n");
+        exit(1);
+    }
+
     // Get number of mapped characters
     uint16_t numChars = get_cmap_size(buffer, &cmap);
     CharacterMap charMap[numChars];
@@ -144,10 +156,20 @@ void load_ttf(char* path) {
     // Get horizontal metrics data
     uint16_t numberOfHMetrics = parse_hhea(buffer, &hhea);
 
-    // Allocate Arrays for hmtx output
-    // TODO: these are not yet used.
+    // Allocate arrays for hmtx output  TODO: these are not yet used.
     uint16_t* advanceWidth = (uint16_t*) malloc(sizeof(uint16_t) * numberOfHMetrics);
     int16_t* leftSideBearings = (int16_t*) malloc(sizeof(int16_t) * numGlyphs);
+
+    // Check if malloc was successful
+    if (advanceWidth == NULL) {
+        printf("Error: Memory allocation failed.\n");
+        exit(1);
+    }
+
+    if (leftSideBearings == NULL) {
+        printf("Error: Memory allocation failed.\n");
+        exit(1);
+    }
 
     parse_hmtx(
         advanceWidth, leftSideBearings, buffer, &hmtx, numberOfHMetrics, numGlyphs);
