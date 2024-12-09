@@ -1,8 +1,8 @@
 .PHONY: build compile
 
-CC = clang
+CC = bear -- clang
 CFLAGS = -Wall -g -Wno-implicit-function-declaration
-LDFLAGS = -I./include/ -I/usr/include/GL $(shell pkg-config --cflags --libs sdl2 gl)
+LDFLAGS = -I./include/ $(shell pkg-config --cflags --libs sdl2 gl)
 SRCS = $(shell find src -name '*.c')
 TARGET = build/main
 
