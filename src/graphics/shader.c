@@ -1,6 +1,6 @@
 #include "graphics/shader.h"
 #include "graphics/graphics.h"
-#include <gl.h>
+#include <GL/gl.h>
 #include <stdio.h>
 #include <stdlib.h>
 

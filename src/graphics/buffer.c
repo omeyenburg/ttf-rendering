@@ -1,6 +1,6 @@
 #include "graphics/buffer.h"
 #include "graphics/graphics.h"
-#include <gl.h>
+#include <GL/gl.h>
 
 GLuint create_buffers() {
     // VAO

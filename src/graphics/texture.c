@@ -1,6 +1,6 @@
 #include "graphics/texture.h"
 #include "graphics/graphics.h"
-#include <gl.h>
+#include <GL/gl.h>
 
 void create_textures() {
     GLuint tex_points;

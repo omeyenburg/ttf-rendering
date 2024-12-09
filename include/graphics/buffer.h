@@ -1,7 +1,7 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include <gl.h>
+#include <GL/gl.h>
 
 GLuint create_buffers();
 
