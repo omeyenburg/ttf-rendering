@@ -15,12 +15,9 @@
           buildInputs = with pkgs; [
             # C/C++ Development Tools
             bear
-            # cmake
-            # gnumake
             clang-tools
             clang
             pkg-config
-            #llvmPackages_19.clangUseLLVM
 
             # Graphics and Multimedia Libraries
             SDL2
