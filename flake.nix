@@ -6,9 +6,13 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+  }:
+    flake-utils.lib.eachDefaultSystem (
+      system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in {
         devShells.default = pkgs.mkShell {
@@ -27,13 +31,8 @@
 
             # OpenGL Support
             mesa
+            cargo
           ];
-
-          # Set up environment variables for OpenGL and SDL
-          shellHook = ''
-            export PS1="\[\033[1;32m\][nix-dev:\w]\$ \[\033[0m\]"
-            echo "> Development Environment Activated"
-          '';
 
           # Ensure proper library paths
           LD_LIBRARY_PATH = "${pkgs.libGL}/lib:${pkgs.mesa}/lib";
