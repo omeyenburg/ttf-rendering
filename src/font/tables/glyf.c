@@ -2,10 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void parse_simple_glyph(Glyph* glyph,
-                        unsigned char* buffer,
-                        uint32_t offset,
-                        int16_t numberOfContours) {
+static Glyph parse_single_glyph(const unsigned char* buffer,
+                                const Table* glyf,
+                                const uint32_t* glyf_offsets,
+                                const uint16_t numGlyphs,
+                                const uint16_t index);
+
+static void parse_simple_glyph(Glyph* glyph,
+                               const unsigned char* buffer,
+                               uint32_t offset,
+                               const int16_t numberOfContours) {
     // Allocate end points
     glyph->endPtsOfContours = (uint16_t*) malloc(numberOfContours * sizeof(uint16_t));
     if (glyph->endPtsOfContours == NULL) {
@@ -15,16 +21,16 @@ void parse_simple_glyph(Glyph* glyph,
 
     // Populate end points
     for (int j = 0; j < numberOfContours; j++) {
-        uint16_t index = getUInt16(buffer, offset + 2 * j);
+        const uint16_t index = getUInt16(buffer, offset + 2 * j);
         glyph->endPtsOfContours[j] = index;
     }
 
     // Get number of points from last end point of contours
-    uint32_t num_points = glyph->endPtsOfContours[numberOfContours - 1] + 1;
+    const uint32_t num_points = glyph->endPtsOfContours[numberOfContours - 1] + 1;
     glyph->numPoints = num_points;
 
     // Skip instructions section
-    uint16_t instructionLength = getUInt16(buffer, offset + 2 * numberOfContours);
+    const uint16_t instructionLength = getUInt16(buffer, offset + 2 * numberOfContours);
     offset += 2 + 2 * numberOfContours + instructionLength;
 
     uint8_t flags[num_points];
@@ -76,7 +82,7 @@ void parse_simple_glyph(Glyph* glyph,
     for (int j = 0; j < num_points; j++) {
         int16_t x;
         int16_t y;
-        uint8_t onCurve = flags[j] & 0x01 ? 1 : 0;
+        const uint8_t onCurve = flags[j] & 0x01 ? 1 : 0;
 
         // X coordinate
         if (flags[j] & 0x02) {
@@ -123,12 +129,12 @@ void parse_simple_glyph(Glyph* glyph,
     }
 }
 
-void parse_compound_glyph(Glyph* glyph,
-                          unsigned char* buffer,
-                          Table* glyf,
-                          uint32_t offset,
-                          uint32_t* glyf_offsets,
-                          uint16_t numGlyphs) {
+static void parse_compound_glyph(Glyph* glyph,
+                                 const unsigned char* buffer,
+                                 const Table* glyf,
+                                 uint32_t offset,
+                                 const uint32_t* glyf_offsets,
+                                 const uint16_t numGlyphs) {
     // Count compounds
     uint16_t flags;
     uint16_t numCompounds = 0;
@@ -209,15 +215,15 @@ void parse_compound_glyph(Glyph* glyph,
                     break;
                 }
             }
-            int16_t x1 = compound_points[j][arg1].x;
-            int16_t y1 = compound_points[j][arg1].y;
-            int16_t x2 = child.points[arg2].x;
-            int16_t y2 = child.points[arg2].y;
+            const int16_t x1 = compound_points[j][arg1].x;
+            const int16_t y1 = compound_points[j][arg1].y;
+            const int16_t x2 = child.points[arg2].x;
+            const int16_t y2 = child.points[arg2].y;
 
             arg1 = x2 - x1;
             arg2 = y2 - y1;
 
-            for (int j = 0; j < child.numPoints; j++) {
+            for (size_t j = 0; j < child.numPoints; j++) {
                 child.points[j].x += arg1;
                 child.points[j].y += arg2;
             }
@@ -320,11 +326,11 @@ void parse_compound_glyph(Glyph* glyph,
     }
 }
 
-Glyph parse_single_glyph(unsigned char* buffer,
-                         Table* glyf,
-                         uint32_t* glyf_offsets,
-                         uint16_t numGlyphs,
-                         uint16_t index) {
+static Glyph parse_single_glyph(const unsigned char* buffer,
+                                const Table* glyf,
+                                const uint32_t* glyf_offsets,
+                                const uint16_t numGlyphs,
+                                const uint16_t index) {
     // Check offset
     uint32_t offset = glyf->offset + glyf_offsets[index];
     if (offset >= glyf->offset + glyf->length) {
@@ -362,10 +368,10 @@ Glyph parse_single_glyph(unsigned char* buffer,
 }
 
 void parse_glyf(Glyph* glyphs,
-                unsigned char* buffer,
-                Table* glyf,
-                uint32_t* glyf_offsets,
-                uint16_t numGlyphs) {
+                const unsigned char* buffer,
+                const Table* glyf,
+                const uint32_t* glyf_offsets,
+                const uint16_t numGlyphs) {
     if (!glyf->initialized) {
         fprintf(stderr, "Table \"glyf\" was not found!\n");
         exit(1);

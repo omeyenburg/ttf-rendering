@@ -66,7 +66,7 @@ Window create_window() {
     return window;
 }
 
-void run(Window* window) {
+void run(const Window* window) {
     int running = 1;
     SDL_Event event;
 
@@ -93,7 +93,7 @@ void run(Window* window) {
     }
 }
 
-void quit(Window* window) {
+void quit(const Window* window) {
     // Cleanup
     glDeleteProgram(window->shader_program);
     SDL_GL_DeleteContext(window->gl_context);

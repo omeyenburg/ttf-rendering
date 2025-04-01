@@ -2,7 +2,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* bytes4xchar(unsigned char* buffer, int offset) {
+uint16_t getUInt16(const uint8_t* buffer, const size_t offset) {
+    return ((uint16_t) buffer[offset] << 8) | (uint16_t) buffer[offset + 1];
+}
+
+int16_t getInt16(const uint8_t* buffer, const size_t offset) {
+    return (int16_t) (((uint16_t) buffer[offset] << 8) | buffer[offset + 1]);
+}
+
+uint32_t getUInt24(const uint8_t* buffer, const size_t offset) {
+    return ((uint32_t) buffer[offset] << 16) | ((uint32_t) buffer[offset + 1] << 8) |
+           (uint32_t) buffer[offset + 2];
+}
+
+uint32_t getUInt32(const uint8_t* buffer, const size_t offset) {
+    return ((uint32_t) buffer[offset] << 24) | ((uint32_t) buffer[offset + 1] << 16) |
+           ((uint32_t) buffer[offset + 2] << 8) | (uint32_t) buffer[offset + 3];
+}
+
+char* bytes4xchar(const unsigned char* buffer, const int offset) {
     static char string[5];
     string[0] = buffer[offset];
     string[1] = buffer[offset + 1];
@@ -13,7 +31,7 @@ char* bytes4xchar(unsigned char* buffer, int offset) {
     return string;
 }
 
-uint16_t unicode(unsigned char* c) {
+uint16_t unicode(const unsigned char* c) {
     if ((c[0] >> 7) == 0) {
         // 1-byte character (ASCII)
         return c[0];
@@ -27,12 +45,12 @@ uint16_t unicode(unsigned char* c) {
     }
 }
 
-bool validateCheckSum(unsigned char* buffer, Table* table, uint32_t adjustment) {
-    uint32_t full_parts = table->length / 4;
-    uint32_t remainder = table->length - full_parts * 4;
+bool validateCheckSum(const unsigned char* buffer, const Table* table, const uint32_t adjustment) {
+    const uint32_t full_parts = table->length / 4;
+    const uint32_t remainder = table->length - full_parts * 4;
 
     uint32_t sum = 0;
-    for (int i = 0; i < full_parts; i++) {
+    for (size_t i = 0; i < full_parts; i++) {
         sum += getUInt32(buffer, table->offset + 4 * i);
     }
 

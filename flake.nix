@@ -31,7 +31,6 @@
 
             # OpenGL Support
             mesa
-            cargo
           ];
 
           # Ensure proper library paths

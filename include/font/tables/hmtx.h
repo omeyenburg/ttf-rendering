@@ -5,9 +5,9 @@
 
 void parse_hmtx(uint16_t* advanceWidth,
                 int16_t* leftSideBearings,
-                unsigned char* buffer,
-                Table* hmtx,
-                uint16_t numberOfHMetrics,
-                uint16_t numGlyphs);
+                const unsigned char* buffer,
+                const Table* hmtx,
+                const uint16_t numberOfHMetrics,
+                const uint16_t numGlyphs);
 
 #endif // HMTX_H

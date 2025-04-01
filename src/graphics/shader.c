@@ -5,9 +5,7 @@
 #include <stdlib.h>
 
 const char* read_file(const char* path) {
-    // Open file
-    FILE* fp;
-    fp = fopen(path, "r");
+    FILE* fp = fopen(path, "r");
     if (fp == NULL) {
         fprintf(stderr, "Failed to open file %s.\n", path);
         exit(1);
@@ -15,8 +13,8 @@ const char* read_file(const char* path) {
 
     // Get file size
     fseek(fp, 0L, SEEK_END);
-    int size = ftell(fp);
-    fseek(fp, 0L, SEEK_SET);
+    const size_t size = ftell(fp);
+    fseek(fp, 0L, SEEK_SET); // or simply rewind(fp)
 
     // Allocate memory for the shader code (+1 for null terminator)
     char* content = (char*) malloc((size + 1) * sizeof(char));
@@ -26,7 +24,15 @@ const char* read_file(const char* path) {
     }
 
     // Read the file contents into the allocated memory
-    fread(content, sizeof(char), size, fp);
+    const size_t bytes_read = fread(content, sizeof(char), size, fp);
+    fclose(fp);
+
+    if (bytes_read < size) {
+        perror("Error reading file or unexpected EOF");
+        free(content);
+        fclose(fp);
+        exit(1);
+    }
 
     // Null-terminate the string
     content[size] = '\0';

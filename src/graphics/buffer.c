@@ -9,8 +9,8 @@ GLuint create_buffers() {
     glBindVertexArray(vao);
 
     // Values for vertices and indices
-    GLfloat vertices[] = {-1, -1, -1, 1, 1, 1, 1, -1};
-    GLuint indices[] = {0, 1, 2, 0, 2, 3};
+    const GLfloat vertices[] = {-1, -1, -1, 1, 1, 1, 1, -1};
+    const GLuint indices[] = {0, 1, 2, 0, 2, 3};
 
     // VBO & EBO
     GLuint vbo, ebo;

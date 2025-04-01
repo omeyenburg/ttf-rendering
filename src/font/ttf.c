@@ -12,14 +12,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-void load_ttf(char* path) {
+void load_ttf(const char* path) {
     printf("Loading font %s\n", path);
 
-    FILE* fp;
-    size_t size;
-    unsigned char* buffer;
-
-    fp = fopen(path, "rb");
+    FILE* fp = fopen(path, "rb");
 
     // Check if file opened successfully
     if (fp == NULL) {
@@ -28,7 +24,7 @@ void load_ttf(char* path) {
     }
 
     fseek(fp, 0, SEEK_END);
-    size = ftell(fp);
+    const size_t size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
     // Check if file size is zero
@@ -38,7 +34,7 @@ void load_ttf(char* path) {
         exit(1);
     }
 
-    buffer = malloc(size);
+    unsigned char* buffer = (unsigned char*) malloc(size);
 
     // Check if malloc was successful
     if (buffer == NULL) {
@@ -75,12 +71,12 @@ void load_ttf(char* path) {
     Table hmtx;
     Table loca;
     Table maxp;
-    int buffer_offset = 12;
-    for (int i = 0; i < numTables; i++) {
+    size_t buffer_offset = 12;
+    for (size_t i = 0; i < numTables; i++) {
         const char* label = bytes4xchar(buffer, buffer_offset);
-        uint32_t checkSum = getUInt32(buffer, buffer_offset + 4);
-        uint32_t offset = getUInt32(buffer, buffer_offset + 8);
-        uint32_t length = getUInt32(buffer, buffer_offset + 12);
+        const uint32_t checkSum = getUInt32(buffer, buffer_offset + 4);
+        const uint32_t offset = getUInt32(buffer, buffer_offset + 8);
+        const uint32_t length = getUInt32(buffer, buffer_offset + 12);
 
         if (strcmp(label, "cmap") == 0) {
             cmap.initialized = true;
@@ -122,8 +118,8 @@ void load_ttf(char* path) {
         buffer_offset += 16;
     }
 
-    int16_t indexToLocFormat = parse_head(buffer, &head);
-    uint16_t numGlyphs = parse_maxp(buffer, &maxp);
+    const int16_t indexToLocFormat = parse_head(buffer, &head);
+    const uint16_t numGlyphs = parse_maxp(buffer, &maxp);
 
     // Relative offsets in glyf
     uint32_t* glyf_offsets = (uint32_t*) malloc(sizeof(uint32_t) * numGlyphs);
@@ -141,7 +137,7 @@ void load_ttf(char* path) {
     }
 
     // Get number of mapped characters
-    uint16_t numChars = get_cmap_size(buffer, &cmap);
+    const uint16_t numChars = get_cmap_size(buffer, &cmap);
     CharacterMap charMap[numChars];
 
     // Get glyph data
@@ -154,7 +150,7 @@ void load_ttf(char* path) {
     parse_cmap(charMap, buffer, &cmap, numChars);
 
     // Get horizontal metrics data
-    uint16_t numberOfHMetrics = parse_hhea(buffer, &hhea);
+    const uint16_t numberOfHMetrics = parse_hhea(buffer, &hhea);
 
     // Allocate arrays for hmtx output  TODO: these are not yet used.
     uint16_t* advanceWidth = (uint16_t*) malloc(sizeof(uint16_t) * numberOfHMetrics);
@@ -188,7 +184,7 @@ void load_ttf(char* path) {
     int n = 0;
     unsigned char c[] = "Ä";
     uint16_t u = unicode(c);
-    for (int i = 0; i < numChars; i++) {
+    for (size_t i = 0; i < numChars; i++) {
         if (charMap[i].unicode == u) {
             n = charMap[i].index;
             break;
@@ -201,7 +197,7 @@ void load_ttf(char* path) {
     //       branching. Might be irrelevant due to looping over lines/beziers.
 
     // Print out points of glyph n
-    for (int i = 0; i < glyphs[n].numPoints; i++) {
+    for (size_t i = 0; i < glyphs[n].numPoints; i++) {
         printf("(%i, %i), ", glyphs[n].points[i].x, glyphs[n].points[i].y);
     }
     printf("\n");
@@ -242,15 +238,15 @@ void load_ttf(char* path) {
     // Count missing onCurve points between two offCurve Points
     uint32_t newNumPoints = 0;
     uint32_t numPoints = 0;
-    for (int i = 0; i < numGlyphs; i++) {
+    for (size_t i = 0; i < numGlyphs; i++) {
         Glyph* glyph = &glyphs[i];
-        for (int j = 0; j < glyph->numberOfContours; j++) {
-            int k_start = (j == 0) ? 0 : (glyph->endPtsOfContours[j - 1] + 1);
-            int k_end = glyph->endPtsOfContours[j] + 1;
+        for (size_t j = 0; j < glyph->numberOfContours; j++) {
+            const int k_start = (j == 0) ? 0 : (glyph->endPtsOfContours[j - 1] + 1);
+            const int k_end = glyph->endPtsOfContours[j] + 1;
             if (i == 36) {
                 printf("%i, %i, \n", k_start, k_end);
             }
-            for (int k = k_start; k < k_end; k++) {
+            for (size_t k = k_start; k < k_end; k++) {
                 int k_last = (k == k_start) ? (k_end - 1) : (k - 1);
                 if (!glyph->points[k].onCurve && !glyph->points[k_last].onCurve) {
                     newNumPoints += 1;
@@ -263,14 +259,14 @@ void load_ttf(char* path) {
     printf("Added %i points; %i.\n", newNumPoints, numPoints);
 
     // Allocate texture data arrays
-    int tex0_size;
-    int tex1_size;
+    size_t tex0_size;
+    size_t tex1_size;
 
     // Deallocate memory
     free(advanceWidth);
     free(leftSideBearings);
 
-    for (int i = 0; i < numGlyphs; i++) {
+    for (size_t i = 0; i < numGlyphs; i++) {
         free(glyphs[i].points);
         free(glyphs[i].endPtsOfContours);
     }

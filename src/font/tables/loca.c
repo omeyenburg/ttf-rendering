@@ -3,10 +3,10 @@
 #include <stdlib.h>
 
 void parse_loca(uint32_t* glyf_offsets,
-                unsigned char* buffer,
-                Table* loca,
-                uint16_t numGlyphs,
-                int16_t indexToLocFormat) {
+                const unsigned char* buffer,
+                const Table* loca,
+                const uint16_t numGlyphs,
+                const int16_t indexToLocFormat) {
     if (!loca->initialized) {
         fprintf(stderr, "Table \"loca\" was not found!\n");
         exit(1);
@@ -18,8 +18,8 @@ void parse_loca(uint32_t* glyf_offsets,
     }
 
     // Populate glyf offsets
-    for (int i = 0; i < numGlyphs; i++) {
-        int offset;
+    for (uint16_t i = 0; i < numGlyphs; i++) {
+        uint32_t offset;
         if (indexToLocFormat == 0) {
             // Short offset (convert to long offset)
             offset = ((uint32_t) getUInt16(buffer, loca->offset + i * 2)) * 2;

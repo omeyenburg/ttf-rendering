@@ -12,7 +12,7 @@ typedef struct {
 } Window;
 
 Window create_window();
-void run(Window* window);
-void quit(Window* window);
+void run(const Window* window);
+void quit(const Window* window);
 
 #endif
