@@ -35,6 +35,10 @@
 
           # Ensure proper library paths
           LD_LIBRARY_PATH = "${pkgs.libGL}/lib:${pkgs.mesa}/lib";
+
+          shellHook = ''
+            export SHELL=${pkgs.bashInteractive}/bin/bash
+          '';
         };
       }
     );
