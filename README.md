@@ -1,10 +1,7 @@
-# TTF OpenGL Renderer
+# TTF Renderer
 
 A small project for rendering text using the TrueType Font format in C.
 This project consists of a TTF parser and a renderer in OpenGL to render text.
-
-## Note for myself
-Run `bear -- make compile` to generate a compile_commands.json.
 
 ## Major sources of help
 

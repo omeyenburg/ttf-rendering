@@ -1,5 +1,5 @@
 {
-  description = "Development environment with bear, OpenGL, SDL, and clangd";
+  description = "Development environment with OpenGL and SDL";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -17,19 +17,7 @@
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            # C/C++ Development Tools
-            bear
-            clang-tools
-            clang
-            pkg-config
-
-            # Graphics and Multimedia Libraries
             SDL2
-            SDL2_ttf
-            SDL2_image
-            SDL2_mixer
-
-            # OpenGL Support
             mesa
           ];
 
