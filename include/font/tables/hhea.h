@@ -3,6 +3,6 @@
 
 #include "font/font.h"
 
-uint16_t parse_hhea(const unsigned char* buffer, const Table* hhea);
+uint16_t parse_hhea(const unsigned char* restrict buffer, const Table* restrict hhea);
 
 #endif // HHEA_H

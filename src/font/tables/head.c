@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int16_t parse_head(unsigned char* buffer, Table* head) {
+int16_t parse_head(unsigned char* restrict buffer, Table* restrict head) {
     if (!head->initialized) {
         fprintf(stderr, "Table \"head\" was not found!\n");
         exit(1);

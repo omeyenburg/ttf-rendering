@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void parse_loca(uint32_t* glyf_offsets,
-                const unsigned char* buffer,
-                const Table* loca,
+void parse_loca(uint32_t* restrict glyf_offsets,
+                const unsigned char* restrict buffer,
+                const Table* restrict loca,
                 const uint16_t numGlyphs,
                 const int16_t indexToLocFormat) {
     if (!loca->initialized) {

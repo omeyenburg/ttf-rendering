@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void parse_hmtx(uint16_t* advanceWidth,
-                int16_t* leftSideBearings,
-                const unsigned char* buffer,
-                const Table* hmtx,
+void parse_hmtx(uint16_t* restrict advanceWidth,
+                int16_t* restrict leftSideBearings,
+                const unsigned char* restrict buffer,
+                const Table* restrict hmtx,
                 const uint16_t numberOfHMetrics,
                 const uint16_t numGlyphs) {
     if (!hmtx->initialized) {

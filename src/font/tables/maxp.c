@@ -1,9 +1,8 @@
 #include "font/tables/maxp.h"
-#include "sys/types.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-uint16_t parse_maxp(const unsigned char* buffer, const Table* maxp) {
+uint16_t parse_maxp(const unsigned char* restrict buffer, const Table* restrict maxp) {
     if (!maxp->initialized) {
         fprintf(stderr, "Table \"maxp\" was not found!\n");
         exit(1);

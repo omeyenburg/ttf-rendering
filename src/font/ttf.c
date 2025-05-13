@@ -49,6 +49,7 @@ void load_ttf(const char* path) {
             "Error: There was an error reading the file %s \nUnexpected file size.\n",
             path);
         free(buffer);
+        buffer = NULL;
         fclose(fp);
         exit(1);
     }
@@ -146,6 +147,7 @@ void load_ttf(const char* path) {
 
     // Deallocate memory for offests in glyf table
     free(glyf_offsets);
+    glyf_offsets = NULL;
 
     parse_cmap(charMap, buffer, &cmap, numChars);
 
@@ -179,6 +181,7 @@ void load_ttf(const char* path) {
     // Close font file and deallocate buffer
     fclose(fp);
     free(buffer);
+    buffer = NULL;
 
     // Get glyph index n from character
     int n = 0;
@@ -265,10 +268,15 @@ void load_ttf(const char* path) {
     // Deallocate memory
     free(advanceWidth);
     free(leftSideBearings);
+    advanceWidth = NULL;
+    leftSideBearings = NULL;
 
     for (size_t i = 0; i < numGlyphs; i++) {
         free(glyphs[i].points);
         free(glyphs[i].endPtsOfContours);
+        glyphs[i].points = NULL;
+        glyphs[i].endPtsOfContours = NULL;
     }
     free(glyphs);
+    glyphs = NULL;
 }

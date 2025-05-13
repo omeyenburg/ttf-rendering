@@ -35,6 +35,6 @@ uint32_t getUInt24(const uint8_t* buffer, const size_t offset);
 uint32_t getUInt32(const uint8_t* buffer, const size_t offset);
 char* bytes4xchar(const unsigned char* buffer, const int offset);
 uint16_t unicode(const unsigned char* c);
-bool validateCheckSum(const unsigned char* buffer, const Table* table, const uint32_t adjustment);
+bool validateCheckSum(const unsigned char* restrict buffer, const Table* restrict table, const uint32_t adjustment);
 
 #endif // FONT_H

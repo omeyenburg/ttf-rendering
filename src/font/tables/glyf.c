@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static Glyph parse_single_glyph(const unsigned char* buffer,
-                                const Table* glyf,
-                                const uint32_t* glyf_offsets,
+static Glyph parse_single_glyph(const unsigned char* restrict buffer,
+                                const Table* restrict glyf,
+                                const uint32_t* restrict glyf_offsets,
                                 const uint16_t numGlyphs,
                                 const uint16_t index);
 
-static void parse_simple_glyph(Glyph* glyph,
-                               const unsigned char* buffer,
+static void parse_simple_glyph(Glyph* restrict glyph,
+                               const unsigned char* restrict buffer,
                                uint32_t offset,
                                const int16_t numberOfContours) {
     // Allocate end points
@@ -129,11 +129,11 @@ static void parse_simple_glyph(Glyph* glyph,
     }
 }
 
-static void parse_compound_glyph(Glyph* glyph,
-                                 const unsigned char* buffer,
-                                 const Table* glyf,
+static void parse_compound_glyph(Glyph* restrict glyph,
+                                 const unsigned char* restrict buffer,
+                                 const Table* restrict glyf,
                                  uint32_t offset,
-                                 const uint32_t* glyf_offsets,
+                                 const uint32_t* restrict glyf_offsets,
                                  const uint16_t numGlyphs) {
     // Count compounds
     uint16_t flags;
@@ -326,9 +326,9 @@ static void parse_compound_glyph(Glyph* glyph,
     }
 }
 
-static Glyph parse_single_glyph(const unsigned char* buffer,
-                                const Table* glyf,
-                                const uint32_t* glyf_offsets,
+static Glyph parse_single_glyph(const unsigned char* restrict buffer,
+                                const Table* restrict glyf,
+                                const uint32_t* restrict glyf_offsets,
                                 const uint16_t numGlyphs,
                                 const uint16_t index) {
     // Check offset
@@ -367,10 +367,10 @@ static Glyph parse_single_glyph(const unsigned char* buffer,
     return glyph;
 }
 
-void parse_glyf(Glyph* glyphs,
-                const unsigned char* buffer,
-                const Table* glyf,
-                const uint32_t* glyf_offsets,
+void parse_glyf(Glyph* restrict glyphs,
+                const unsigned char* restrict buffer,
+                const Table* restrict glyf,
+                const uint32_t* restrict glyf_offsets,
                 const uint16_t numGlyphs) {
     if (!glyf->initialized) {
         fprintf(stderr, "Table \"glyf\" was not found!\n");

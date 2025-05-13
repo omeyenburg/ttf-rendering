@@ -45,7 +45,9 @@ uint16_t unicode(const unsigned char* c) {
     }
 }
 
-bool validateCheckSum(const unsigned char* buffer, const Table* table, const uint32_t adjustment) {
+bool validateCheckSum(const unsigned char* restrict buffer,
+                      const Table* restrict table,
+                      const uint32_t adjustment) {
     const uint32_t full_parts = table->length / 4;
     const uint32_t remainder = table->length - full_parts * 4;
 

@@ -3,6 +3,6 @@
 
 #include "font/font.h"
 
-uint16_t parse_maxp(const unsigned char* buffer, const Table* maxp);
+uint16_t parse_maxp(const unsigned char* restrict buffer, const Table* restrict maxp);
 
 #endif // MAXP_H

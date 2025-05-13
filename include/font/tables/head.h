@@ -3,6 +3,6 @@
 
 #include "font/font.h"
 
-int16_t parse_head(unsigned char* buffer, Table* head);
+int16_t parse_head(unsigned char* restrict buffer, Table* restrict head);
 
 #endif // HEAD_H

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-uint16_t parse_hhea(const unsigned char* buffer, const Table* hhea) {
+uint16_t parse_hhea(const unsigned char* restrict buffer, const Table* restrict hhea) {
     if (!hhea->initialized) {
         fprintf(stderr, "Table \"hhea\" was not found!\n");
         exit(1);
